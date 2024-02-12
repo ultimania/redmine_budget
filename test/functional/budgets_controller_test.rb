@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class PollsControllerTest < ActionController::TestCase
+class BudgetsControllerTest < ActionController::TestCase
   # Replace this with your real tests.
   def test_truth
     assert true
