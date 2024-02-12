@@ -1,0 +1,14 @@
+<% html_title "Polls" %>
+<h2>Polls</h2>
+
+<% @polls.each do |poll| %>
+  <p>
+  <%= poll.question %>?
+  <%= link_to 'Yes', {:action => 'vote', :id => poll[:id], :answer => 'yes' }, :method => :post, :class => 'vote yes' %> (<%= poll.yes %>)
+  <%= link_to 'No', {:action => 'vote', :id => poll[:id], :answer => 'no' }, :method => :post, :class => 'vote no' %> (<%= poll.no %>)
+  </p>
+<% end %>
+
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'voting', :plugin => 'polls' %>
+<% end %>
