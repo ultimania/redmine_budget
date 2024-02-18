@@ -7,12 +7,11 @@ Redmine::Plugin.register :redmine_budget do
   version '0.0.1'
   url 'https://github.com/ultimania/redmine_budget'
   author_url 'https://github.com/ultimania'
-  # menu :project_menu, :budgets, { :controller => 'budgets', :action => 'index' }, :caption => 'Budget'
-  permission :budgets, { :budgets => [:index] }, :public => true
-  # permission :view_redmine_budget, :redmine_budget => :index
-  # permission :vote_redmine_budget, :redmine_budget => :vote
+
   project_module :budgets do
-    permission :view_budgets, :budgets => :index
+    permission :view_budgets, budgets: :index, require: :member
   end
+
   menu :project_menu, :budgets, { :controller => 'budgets', :action => 'index' }, :caption => 'Budget', :after => :activity, :param => :project_id
+  # menu :project_menu, :budgets, { controller: :budgets, action: :index }, caption: 'Budget', param: :project_id, after: :activity
 end
