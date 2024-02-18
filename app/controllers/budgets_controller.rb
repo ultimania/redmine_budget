@@ -17,6 +17,8 @@ class BudgetsController < ApplicationController
     retrieve_query
     @query.group_by = nil
     @query.sort_criteria = nil
+    @user = "#{User.current.lastname} #{User.current.firstname}"
+    p(@user)
     return unless @query.valid?
 
     events = []
