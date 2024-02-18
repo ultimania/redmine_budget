@@ -1,5 +1,6 @@
 class BudgetsController < ApplicationController
   include IssueDataFetcher
+  include QueriesHelper
 
   before_action :find_project
 
@@ -10,7 +11,32 @@ class BudgetsController < ApplicationController
     @cfg_param = {}
     @selectable_assignees = selectable_assignee_list(@project)
     @cfg_param[:basis_date] = Date.today
+    @year ||= User.current.today.year
+    @month ||= User.current.today.month
+    @calendar = Calendar.new(Date.civil(@year, @month, 1), current_language, :month)
+    retrieve_query
+    @query.group_by = nil
+    @query.sort_criteria = nil
+    return unless @query.valid?
 
+    events = []
+    events +=
+      @query.issues(
+        include: %i[tracker assigned_to priority],
+        conditions: [
+          '((start_date BETWEEN ? AND ?) OR (due_date BETWEEN ? AND ?))',
+          @calendar.startdt, @calendar.enddt,
+          @calendar.startdt, @calendar.enddt
+        ]
+      )
+    events +=
+      @query.versions(
+        conditions: [
+          'effective_date BETWEEN ? AND ?',
+          @calendar.startdt, @calendar.enddt
+        ]
+      )
+    @calendar.events = events
   end
 
   private
