@@ -34,7 +34,7 @@
 <%= hidden_field_tag 'back_url', url_for(:params => request.query_parameters), :id => nil %>
 <ul class="cal">
   <li class="budgetuser">
-    <%= "#{@user}" %>
+    <%= "test user" %>
   </li>
   <% @calendar.format_month.each do |day| %>
     <li class="<%= @calendar.day_css_classes day %> budgetbody">

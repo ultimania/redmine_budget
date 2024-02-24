@@ -21,10 +21,12 @@
 class Calendar
   include Redmine::Utils::DateCalculation
   attr_reader :startdt, :enddt
+  attr_writer :time_entries
 
   def initialize(date, _lang = current_language, period = :month)
     @date = date
     @events = []
+    @time_entries = []
     @ending_events_by_days = {}
     @starting_events_by_days = {}
     # set_language_if_valid lang

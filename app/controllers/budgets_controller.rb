@@ -5,40 +5,49 @@ class BudgetsController < ApplicationController
   before_action :find_project
 
   def index
-    # @budgets = @project.budgets
-    # @budgets = Budget.find(:all) # @project.budgets
     @budgets = Budget.all
     @cfg_param = {}
     @selectable_assignees = selectable_assignee_list(@project)
-    @cfg_param[:basis_date] = Date.today
-    @year ||= User.current.today.year
-    @month ||= User.current.today.month
-    @calendar = Calendar.new(Date.civil(@year, @month, 1), current_language, :month)
+
+    # Get from Params
+    @cfg_param[:basis_date] = params[:basis_date]
+    @cfg_param[:selected_assignee_id] = params[:selected_assignee_id]
+
+    # Create calender object
+    year ||= User.current.today.year
+    month ||= User.current.today.month
+    @calendar = Calendar.new(
+      Date.civil(year, month, 1),
+      current_language,
+      :month
+    )
     retrieve_query
     @query.group_by = nil
     @query.sort_criteria = nil
-    @user = "#{User.current.lastname} #{User.current.firstname}"
-    p(@user)
     return unless @query.valid?
 
+    # Get events and time entries each of assignee
     events = []
-    events +=
-      @query.issues(
+    return unless @cfg_param[:selected_assignee_id]
+
+    @cfg_param[:selected_assignee_id].each do |user|
+      # Get events
+      events += @query.issues(
         include: %i[tracker assigned_to priority],
         conditions: [
-          '((start_date BETWEEN ? AND ?) OR (due_date BETWEEN ? AND ?))',
+          '((start_date BETWEEN ? AND ?) OR (due_date BETWEEN ? AND ?))' \
+            'AND assigned_to_id = ?',
           @calendar.startdt, @calendar.enddt,
-          @calendar.startdt, @calendar.enddt
+          @calendar.startdt, @calendar.enddt,
+          user
         ]
       )
-    events +=
-      @query.versions(
-        conditions: [
-          'effective_date BETWEEN ? AND ?',
-          @calendar.startdt, @calendar.enddt
-        ]
-      )
-    @calendar.events = events
+      @calendar.events = events
+
+      # Get time entries
+      time_entries = TimeEntry.where(['user_id = ?', user])
+      @calendar.time_entries = time_entries
+    end
   end
 
   private
