@@ -105,4 +105,8 @@ class Calendar
       )
       .sum(:hours).to_f
   end
+
+  def total_estimated_hours(_user, _day)
+    1
+  end
 end

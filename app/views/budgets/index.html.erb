@@ -35,7 +35,7 @@
   <%= hidden_field_tag 'back_url', url_for(:params => request.query_parameters), :id => nil %>
   <table class="cal">
   <!-- Calender header -->
-  <tr><td></td>
+  <tr><td colspan="2"></td>
   <% @calendar.format_month.each do |day| %>
     <td class="<%= @calendar.day_css_classes(day) %> budgetbody">
       <p class="day-num"><%= day.day %>
@@ -45,12 +45,24 @@
   <% end %>
   </tr>
   <!-- Calender contents -->
+  <tr class="budgetuser">
   <% if @cfg_param[:selected_assignee_id].present? %>
     <% @cfg_param[:selected_assignee_id].each do |user| %>
-      <tr class="budgetuser">
-        <td>
-          <%= @selectable_assignees.invert[user.to_i] %>
+      <td rowspan="2">
+        <%= @selectable_assignees.invert[user.to_i] %>
+      </td>
+      <!-- estimated hours -->
+      <td>予定</td>
+      <% @calendar.format_month.each do |day| %>
+        <td class="<%= @calendar.day_css_classes(day) %> budgetbody">
+          <p class="total-time">
+            <%= "#{@calendar.total_estimated_hours(user, day)}" %>
+          </p>
         </td>
+      <% end %>
+      </tr><tr>
+      <!-- time entries -->
+      <td>実績</td>
       <% @calendar.format_month.each do |day| %>
         <td class="<%= @calendar.day_css_classes(day) %> budgetbody">
           <p class="total-time">
@@ -58,9 +70,9 @@
           </p>
         </td>
       <% end %>
-      </tr>
     <% end %>
   <% end %>
+  </tr>
   </table>
 <% end %>
 <%= context_menu %>
