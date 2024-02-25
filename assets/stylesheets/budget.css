@@ -1,0 +1,58 @@
+/* カレンダー全体のスタイル */
+.budget-cal {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* ヘッダ行のスタイル */
+.budget-cal-header {
+  background-color: #f2f2f2; /* 背景色を薄い灰色に */
+}
+
+.budget-cal-header td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #dddddd; /* 境界線を設定 */
+}
+
+td.budget-cal-user {
+  width: fit-content;
+}
+
+/* 予定行と実績行のスタイル */
+.budget-estimated,
+.budget-entry {
+  background-color: #f9f9f9; /* 背景色を薄いグレーに */
+}
+
+.budget-estimated td,
+.budget-entry td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #dddddd; /* 境界線を設定 */
+}
+
+/* 白抜き文字のスタイル */
+.budget-cal-header td
+{
+  color: white; /* 文字色を白に */
+  background-color: #6eaa96;
+}
+
+td.budget-estimated {
+  background-color: #f6f7f8;
+}
+
+td.budget-entry {
+  background-color: #ffffff;
+}
+
+/* nwdayクラスがある場合のスタイル */
+td.budget-entry.nwday,
+td.budget-estimated.nwday {
+  background-color: #d2d2d2; /* 背景色を灰色に */
+}
+
+.row-header {
+  font-weight: bold;
+}

@@ -1,4 +1,5 @@
 <% html_title "Budgets" %>
+<%= stylesheet_link_tag 'budget', :plugin => 'redmine_budget' %>
 <h2>Budgets</h2>
 
 <!--option -->
@@ -31,44 +32,46 @@
 <!-- Calender -->
 <%= form_tag({}, :data => {:cm_url => issues_context_menu_path}) do -%>
   <%= hidden_field_tag 'back_url', url_for(:params => request.query_parameters), :id => nil %>
-  <table class="cal">
+  <table class="budget-cal">
   <!-- Calender header -->
-  <tr><td colspan="2"></td>
-  <% @calendar.format_month.each do |day| %>
-    <td class="<%= @calendar.day_css_classes(day) %> budgetbody">
-      <p class="day-num"><%= day.day %>
-        <span class="abbr-day">(<%= abbr_day_name(day.cwday) %>)</span>
-      </p>
-    </td>
-  <% end %>
+  <tr class="budget-cal-header">
+    <td colspan="2"></td>
+    <% @calendar.format_month.each do |day| %>
+      <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell">
+        <p class="day-num"><%= day.day %>
+          <span class="abbr-day">(<%= abbr_day_name(day.cwday) %>)</span>
+        </p>
+      </td>
+    <% end %>
   </tr>
   <!-- Calender contents -->
   <% if @cfg_param[:selected_assignee_id].present? %>
     <% @cfg_param[:selected_assignee_id].each do |user| %>
-    <tr class="budgetuser">
-      <td rowspan="2">
-        <%= @selectable_assignees.invert[user.to_i] %>
-      </td>
-      <!-- estimated hours -->
-      <td>予定</td>
-      <% @calendar.format_month.each do |day| %>
-        <td class="<%= @calendar.day_css_classes(day) %> budgetbody">
-          <p class="total-time">
-            <%= "#{@calendar.total_estimated_hours(user, day).round(1)}" %>
-          </p>
+      <tr class="budget-cal-row budget-estimated">
+        <td class="budget-cal-user" rowspan="2">
+          <%= @selectable_assignees.invert[user.to_i] %>
         </td>
-      <% end %>
-      </tr><tr>
-      <!-- time entries -->
-      <td>実績</td>
-      <% @calendar.format_month.each do |day| %>
-        <td class="<%= @calendar.day_css_classes(day) %> budgetbody">
-          <p class="total-time">
-            <%= "#{@calendar.total_time_entries(user, day).round(1)}" %>
-          </p>
-        </td>
-      <% end %>
-     </tr>
+        <!-- estimated hours -->
+        <td class="budget-cal-cell budget-estimated row-header">予定</td>
+        <% @calendar.format_month.each do |day| %>
+          <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell budget-estimated">
+            <p class="total-time">
+              <%= "#{@calendar.total_estimated_hours(user, day).round(1)}" %>
+            </p>
+          </td>
+        <% end %>
+      </tr>
+      <tr class="budget-cal-row budget-entry">
+        <!-- time entries -->
+        <td class="budget-cal-cell budget-entry row-header">実績</td>
+        <% @calendar.format_month.each do |day| %>
+          <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell budget-entry">
+            <p class="total-time">
+              <%= "#{@calendar.total_time_entries(user, day).round(1)}" %>
+            </p>
+          </td>
+        <% end %>
+      </tr>
     <% end %>
   <% end %>
   </table>

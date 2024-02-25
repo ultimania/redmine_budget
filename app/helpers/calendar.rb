@@ -34,10 +34,6 @@ class Calendar
     when :month
       @startdt = Date.civil(date.year, date.month, 1)
       @enddt = (@startdt >> 1) - 1
-      # starts from the first day of the week
-      @startdt -= (@startdt.cwday - first_wday) % 7
-      # ends on the last day of the week
-      @enddt += (last_wday - @enddt.cwday) % 7
     when :week
       @startdt = date - (date.cwday - first_wday) % 7
       @enddt = date + (last_wday - date.cwday) % 7
@@ -108,9 +104,10 @@ class Calendar
     issues = events_on(day).select do |event|
       event.assigned_to_id == user.to_i
     end
+    return 0.0 unless issues.present?
+
     issues.sum do |issue|
       result = issue.total_estimated_hours.to_f / (issue.duration + 1)
-      result.to_f
     end
   end
 end
