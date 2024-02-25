@@ -66,7 +66,9 @@ class Calendar
 
   # Returns events for the given day
   def events_on(day)
-    @events.select { |event| (event.due_date >= day) && (event.start_date <= day) }
+    @events.select do |event|
+      event.due_date.present? && event.start_date.present? && (event.due_date >= day) && (event.start_date <= day)
+    end
   end
 
   # Calendar current month
@@ -103,10 +105,12 @@ class Calendar
   end
 
   def total_estimated_hours(user, day)
-    # 対象日のissueについて、予定工数を按分したものを合計する
-    issues = events_on(day).select { |event| event.assigned_to_id == user.to_i }
+    issues = events_on(day).select do |event|
+      event.assigned_to_id == user.to_i
+    end
     issues.sum do |issue|
-      issue.total_estimated_hours.to_f / (issue.duration + 1)
+      result = issue.total_estimated_hours.to_f / (issue.duration + 1)
+      result.to_f
     end
   end
 end

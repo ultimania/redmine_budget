@@ -6,12 +6,6 @@
   <fieldset id="filters" class="collapsible">
     <legend onclick="toggleFieldset(this);" class="icon icon-collapsed"><%= l(:label_options) %></legend>
     <div style="display: none;">
-      <!-- basis date -->
-      <div class="evm-div-col">
-        <fieldset><legend><%= l(:label_basis_date) %></legend>
-          <%= date_field_tag("basis_date", @cfg_param[:basis_date], size: 8) %><%= calendar_for("basis_date") %>
-        </fieldset>
-      </div>
       <!-- selectable assignee -->
       <div class="evm-div-col">
         <fieldset><legend><%= l(:label_select_assignee) %></legend>
@@ -24,6 +18,10 @@
     </div>
   </fieldset>
   <!-- Apply button -->
+  <%= label_tag('month', l(:label_month)) %>
+  <%= select_month(@month, :prefix => "month", :discard_type => true) %>
+  <%= label_tag('year', l(:label_year)) %>
+  <%= select_year(@year, :prefix => "year", :discard_type => true) %>
   <p class="buttons">
     <%= link_to "#", {onclick: "$(this).closest('form').submit()", class: "icon icon-checked" } do l(:button_apply) end %>
     <%= link_to l(:button_clear), { basis_date: Date.today }, :class => "icon icon-reload"  %>
@@ -45,9 +43,9 @@
   <% end %>
   </tr>
   <!-- Calender contents -->
-  <tr class="budgetuser">
   <% if @cfg_param[:selected_assignee_id].present? %>
     <% @cfg_param[:selected_assignee_id].each do |user| %>
+    <tr class="budgetuser">
       <td rowspan="2">
         <%= @selectable_assignees.invert[user.to_i] %>
       </td>
@@ -56,7 +54,7 @@
       <% @calendar.format_month.each do |day| %>
         <td class="<%= @calendar.day_css_classes(day) %> budgetbody">
           <p class="total-time">
-            <%= "#{@calendar.total_estimated_hours(user, day)}" %>
+            <%= "#{@calendar.total_estimated_hours(user, day).round(1)}" %>
           </p>
         </td>
       <% end %>
@@ -66,13 +64,13 @@
       <% @calendar.format_month.each do |day| %>
         <td class="<%= @calendar.day_css_classes(day) %> budgetbody">
           <p class="total-time">
-            <%= "#{@calendar.total_time_entries(user, day)}" %>
+            <%= "#{@calendar.total_time_entries(user, day).round(1)}" %>
           </p>
         </td>
       <% end %>
+     </tr>
     <% end %>
   <% end %>
-  </tr>
   </table>
 <% end %>
 <%= context_menu %>

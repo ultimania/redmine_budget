@@ -12,12 +12,14 @@ class BudgetsController < ApplicationController
     # Get from Params
     @cfg_param[:basis_date] = params[:basis_date]
     @cfg_param[:selected_assignee_id] = params[:selected_assignee_id]
-
-    # Create calender object
-    year ||= User.current.today.year
-    month ||= User.current.today.month
+    if params[:year] and params[:year].to_i > 1900
+      @year = params[:year].to_i
+      @month = params[:month].to_i if params[:month] and params[:month].to_i > 0 and params[:month].to_i < 13
+    end
+    @year ||= User.current.today.year
+    @month ||= User.current.today.month
     @calendar = Calendar.new(
-      Date.civil(year, month, 1),
+      Date.civil(@year, @month, 1),
       current_language,
       :month
     )
