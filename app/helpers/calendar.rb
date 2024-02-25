@@ -62,15 +62,11 @@ class Calendar
   end
 
   # Sets calendar events
-  def events=(events)
-    @events = events
-    @ending_events_by_days = @events.group_by { |event| event.due_date }
-    @starting_events_by_days = @events.group_by { |event| event.start_date }
-  end
+  attr_writer :events
 
   # Returns events for the given day
   def events_on(day)
-    ((@ending_events_by_days[day] || []) + (@starting_events_by_days[day] || [])).uniq
+    @events.select { |event| (event.due_date >= day) && (event.start_date <= day) }
   end
 
   # Calendar current month
@@ -106,7 +102,11 @@ class Calendar
       .sum(:hours).to_f
   end
 
-  def total_estimated_hours(_user, _day)
-    1
+  def total_estimated_hours(user, day)
+    # 対象日のissueについて、予定工数を按分したものを合計する
+    issues = events_on(day).select { |event| event.assigned_to_id == user.to_i }
+    issues.sum do |issue|
+      issue.total_estimated_hours.to_f / (issue.duration + 1)
+    end
   end
 end
