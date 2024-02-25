@@ -1,4 +1,4 @@
-#require_dependency 'redmine_budget_hook_listener'
+# require_dependency 'redmine_budget_hook_listener'
 
 Redmine::Plugin.register :redmine_budget do
   name 'Budget Management plugin'
@@ -12,6 +12,7 @@ Redmine::Plugin.register :redmine_budget do
     permission :view_budgets, budgets: :index, require: :member
   end
 
-  menu :project_menu, :budgets, { :controller => 'budgets', :action => 'index' }, :caption => 'Budget', :after => :activity, :param => :project_id
+  menu :project_menu, :budgets, { controller: :budgets, action: :index },
+       caption: :tab_display_name, after: :activity, param: :project_id
   # menu :project_menu, :budgets, { controller: :budgets, action: :index }, caption: 'Budget', param: :project_id, after: :activity
 end

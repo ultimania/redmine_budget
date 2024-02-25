@@ -1,6 +1,6 @@
 <% html_title "Budgets" %>
 <%= stylesheet_link_tag 'budget', :plugin => 'redmine_budget' %>
-<h2>Budgets</h2>
+<h2><%= l(:title_budget_tab) %></h2>
 
 <!--option -->
 <%= form_tag url_for(action: :index), method: :get, id: "query_form" do %>
@@ -52,7 +52,7 @@
           <%= @selectable_assignees.invert[user.to_i] %>
         </td>
         <!-- estimated hours -->
-        <td class="budget-cal-cell budget-estimated row-header">予定</td>
+        <td class="budget-cal-cell budget-estimated row-header">予</td>
         <% @calendar.format_month.each do |day| %>
           <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell budget-estimated">
             <p class="total-time">
@@ -63,7 +63,7 @@
       </tr>
       <tr class="budget-cal-row budget-entry">
         <!-- time entries -->
-        <td class="budget-cal-cell budget-entry row-header">実績</td>
+        <td class="budget-cal-cell budget-entry row-header">実</td>
         <% @calendar.format_month.each do |day| %>
           <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell budget-entry">
             <p class="total-time">
