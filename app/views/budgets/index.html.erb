@@ -30,26 +30,37 @@
   </p>
 <% end %>
 
+<!-- Calender -->
 <%= form_tag({}, :data => {:cm_url => issues_context_menu_path}) do -%>
   <%= hidden_field_tag 'back_url', url_for(:params => request.query_parameters), :id => nil %>
-  <ul class="cal">
+  <table class="cal">
+  <!-- Calender header -->
+  <tr><td></td>
+  <% @calendar.format_month.each do |day| %>
+    <td class="<%= @calendar.day_css_classes(day) %> budgetbody">
+      <p class="day-num"><%= day.day %>
+        <span class="abbr-day">(<%= abbr_day_name(day.cwday) %>)</span>
+      </p>
+    </td>
+  <% end %>
+  </tr>
+  <!-- Calender contents -->
   <% if @cfg_param[:selected_assignee_id].present? %>
     <% @cfg_param[:selected_assignee_id].each do |user| %>
-      <li class="budgetuser">
-        <%= @selectable_assignees.invert[user.to_i] %>
-      </li>
+      <tr class="budgetuser">
+        <td>
+          <%= @selectable_assignees.invert[user.to_i] %>
+        </td>
       <% @calendar.format_month.each do |day| %>
-        <li class="<%= @calendar.day_css_classes(day) %> budgetbody">
-          <p class="day-num"><%= day.day %>
-            <span class="abbr-day">(<%= abbr_day_name(day.cwday) %>)</span>
-          </p>
+        <td class="<%= @calendar.day_css_classes(day) %> budgetbody">
           <p class="total-time">
             <%= "#{@calendar.total_time_entries(user, day)}" %>
           </p>
-        </li>
+        </td>
       <% end %>
+      </tr>
     <% end %>
   <% end %>
-  </ul>
+  </table>
 <% end %>
 <%= context_menu %>
