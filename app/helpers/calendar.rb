@@ -88,23 +88,26 @@ class Calendar
     @last_dow ||= (first_wday + 5) % 7 + 1
   end
 
-  def total_time_entries(user, day)
-    @time_entries
-      .where(
-        user_id: user,
-        spent_on: day
-      )
-      .sum(:hours).to_f
-  end
-
-  def total_estimated_hours(user, day)
-    issues = events_on(day).select do |event|
+  def total_estimated_hours(user, day = nil)
+    events = day.present? ? events_on(day) : @events
+    issues = events.select do |event|
       event.assigned_to_id == user.to_i
     end
     return 0.0 unless issues.present?
 
     issues.sum do |issue|
-      result = issue.total_estimated_hours.to_f / (issue.duration + 1)
+      duration = issue.duration.zero? ? 1 : issue.duration
+      result = day.nil? ? issue.total_estimated_hours.to_f : issue.total_estimated_hours.to_f / duration
     end
+  end
+
+  def total_time_entries(user, day = nil)
+    conditions = { user_id: user }
+    conditions[:spent_on] = day if day.present?
+
+    @time_entries
+      .where(conditions)
+      .sum(:hours)
+      .to_f
   end
 end
