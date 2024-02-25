@@ -30,24 +30,20 @@ class BudgetsController < ApplicationController
     events = []
     return unless @cfg_param[:selected_assignee_id]
 
-    @cfg_param[:selected_assignee_id].each do |user|
-      # Get events
-      events += @query.issues(
-        include: %i[tracker assigned_to priority],
-        conditions: [
-          '((start_date BETWEEN ? AND ?) OR (due_date BETWEEN ? AND ?))' \
-            'AND assigned_to_id = ?',
-          @calendar.startdt, @calendar.enddt,
-          @calendar.startdt, @calendar.enddt,
-          user
-        ]
-      )
-      @calendar.events = events
+    # Get events
+    events = @query.issues(
+      include: %i[tracker assigned_to priority],
+      conditions: [
+        '((start_date BETWEEN ? AND ?) OR (due_date BETWEEN ? AND ?))',
+        @calendar.startdt, @calendar.enddt,
+        @calendar.startdt, @calendar.enddt
+      ]
+    )
+    @calendar.events = events
 
-      # Get time entries
-      time_entries = TimeEntry.where(['user_id = ?', user])
-      @calendar.time_entries = time_entries
-    end
+    # Get time entries
+    time_entries = TimeEntry.where(user_id: @cfg_param[:selected_assignee_id])
+    @calendar.time_entries = time_entries
   end
 
   private

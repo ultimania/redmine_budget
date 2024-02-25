@@ -96,4 +96,13 @@ class Calendar
   def last_wday
     @last_dow ||= (first_wday + 5) % 7 + 1
   end
+
+  def total_time_entries(user, day)
+    @time_entries
+      .where(
+        user_id: user,
+        spent_on: day
+      )
+      .sum(:hours).to_f
+  end
 end
