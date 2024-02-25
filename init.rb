@@ -14,5 +14,4 @@ Redmine::Plugin.register :redmine_budget do
 
   menu :project_menu, :budgets, { controller: :budgets, action: :index },
        caption: :tab_display_name, after: :activity, param: :project_id
-  # menu :project_menu, :budgets, { controller: :budgets, action: :index }, caption: 'Budget', param: :project_id, after: :activity
 end

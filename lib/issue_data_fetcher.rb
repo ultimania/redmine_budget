@@ -40,10 +40,10 @@ module IssueDataFetcher
   # @param [object] proj project object
   # @param [hush] condition fieldname(symbol) conditon value
   # @return [Issue] issue object
-  def evm_issues(proj, condition = " 1 = 1 ")
-    Issue.cross_project_scope(proj, "descendants").
-      where(SQL_COM.to_s).
-      where(condition)
+  def evm_issues(proj, condition = ' 1 = 1 ')
+    Issue.cross_project_scope(proj, 'descendants')
+         .where(SQL_COM.to_s)
+         .where(condition)
   end
 
   # Get descendants parent issue
@@ -51,10 +51,10 @@ module IssueDataFetcher
   # @param [Numeric] issue_id selected issue
   # @return [Issue] descendants issues
   def parent_issues(issue_id)
-    Issue.joins(SQL_JOIN.to_s).
-      where(SQL_COM.to_s).
-      where(SQL_COM_ANC.to_s).
-      where(ancestors: { id: issue_id })
+    Issue.joins(SQL_JOIN.to_s)
+         .where(SQL_COM.to_s)
+         .where(SQL_COM_ANC.to_s)
+         .where(ancestors: { id: issue_id })
   end
 
   # Get spent time of project.
@@ -62,12 +62,12 @@ module IssueDataFetcher
   #
   # @param [Project] proj project
   # @return [Hash] Two column,spent_on,sum of hours
-  def evm_costs(proj, condition = " 1 = 1 ")
-    Issue.cross_project_scope(proj, "descendants").
-      where(SQL_COM.to_s).
-      where(condition).
-      joins(:time_entries).
-      group(:spent_on).sum(:hours)
+  def evm_costs(proj, condition = ' 1 = 1 ')
+    Issue.cross_project_scope(proj, 'descendants')
+         .where(SQL_COM.to_s)
+         .where(condition)
+         .joins(:time_entries)
+         .group(:spent_on).sum(:hours)
   end
 
   # Get spent time of parent issue
@@ -75,12 +75,12 @@ module IssueDataFetcher
   # @param [Numeric] issue_id selected issue
   # @return [Hash] Two column,spent_on,sum of hours
   def parent_issue_costs(issue_id)
-    Issue.joins(SQL_JOIN.to_s).
-      where(SQL_COM.to_s).
-      where(SQL_COM_ANC.to_s).
-      where(ancestors: { id: issue_id }).
-      joins(:time_entries).
-      group(:spent_on).sum(:hours)
+    Issue.joins(SQL_JOIN.to_s)
+         .where(SQL_COM.to_s)
+         .where(SQL_COM_ANC.to_s)
+         .where(ancestors: { id: issue_id })
+         .joins(:time_entries)
+         .group(:spent_on).sum(:hours)
   end
 
   # Get pair of project id and fixed version id.
@@ -88,11 +88,11 @@ module IssueDataFetcher
   # @param [Project] proj project object
   # @return [Array] project_id, fixed_version_id
   def project_varsion_id_pair(proj)
-    Issue.cross_project_scope(proj, "descendants").
-      where(SQL_COM.to_s).
-      where.not(fixed_version_id: nil).
-      distinct(:project_id, :fixed_version_id).
-      pluck(:project_id, :fixed_version_id)
+    Issue.cross_project_scope(proj, 'descendants')
+         .where(SQL_COM.to_s)
+         .where.not(fixed_version_id: nil)
+         .distinct(:project_id, :fixed_version_id)
+         .pluck(:project_id, :fixed_version_id)
   end
 
   # Get assinee ids in project.
@@ -101,10 +101,10 @@ module IssueDataFetcher
   # @param [Project] proj project object
   # @return [Issue] assigned_to_id
   def assignee_ids(proj)
-    Issue.cross_project_scope(proj, "descendants").
-      where(SQL_COM.to_s).
-      distinct(:assigned_to_id).
-      pluck(:assigned_to_id)
+    Issue.cross_project_scope(proj, 'descendants')
+         .where(SQL_COM.to_s)
+         .distinct(:assigned_to_id)
+         .pluck(:assigned_to_id)
   end
 
   # Selectable assinee list.
@@ -127,11 +127,11 @@ module IssueDataFetcher
   # @param [Project] proj project object
   # @return [Issue] fixed_version_id, versions.name
   def selectable_version_list(proj)
-    Issue.cross_project_scope(proj, "descendants").
-      select(:fixed_version_id, "versions.name").
-      where(SQL_COM.to_s).
-      joins(:fixed_version).
-      group(:fixed_version_id, "versions.name")
+    Issue.cross_project_scope(proj, 'descendants')
+         .select(:fixed_version_id, 'versions.name')
+         .where(SQL_COM.to_s)
+         .joins(:fixed_version)
+         .group(:fixed_version_id, 'versions.name')
   end
 
   # Selectable tracker list
@@ -139,11 +139,11 @@ module IssueDataFetcher
   # @param [Project] proj project object
   # @return [Issue] tracker_id, name
   def selectable_tracker_list(proj)
-    Issue.cross_project_scope(proj, "descendants").
-      select(:tracker_id, "trackers.name").
-      where(SQL_COM.to_s).
-      joins(:tracker).
-      group(:tracker_id, "trackers.name")
+    Issue.cross_project_scope(proj, 'descendants')
+         .select(:tracker_id, 'trackers.name')
+         .where(SQL_COM.to_s)
+         .joins(:tracker)
+         .group(:tracker_id, 'trackers.name')
   end
 
   # Selectable parent issue list
@@ -151,10 +151,10 @@ module IssueDataFetcher
   # @param [Project] proj project object
   # @return [Issue] parent issues
   def selectable_parent_issues_list(proj)
-    Issue.where(project_id: proj.id).
-      select(:id, :subject).
-      where(parent_id: nil).
-      where("( rgt - lft ) > 1")
+    Issue.where(project_id: proj.id)
+         .select(:id, :subject)
+         .where(parent_id: nil)
+         .where('( rgt - lft ) > 1')
   end
 
   # Get imcomplete issuees on basis date.
@@ -163,12 +163,12 @@ module IssueDataFetcher
   # @param [Date] basis_date basis date
   # @return [Issue] issue object
   def incomplete_project_issues(proj, basis_date)
-    Issue.cross_project_scope(proj, "descendants").
-      where(SQL_COM.to_s).
-      where("(due_date <= ? AND (closed_on IS NULL OR closed_on > ?))",
-            basis_date, basis_date.end_of_day).
-      where("done_ratio <> 100 ").
-      order(due_date: :ASC)
+    Issue.cross_project_scope(proj, 'descendants')
+         .where(SQL_COM.to_s)
+         .where('(due_date <= ? AND (closed_on IS NULL OR closed_on > ?))',
+                basis_date, basis_date.end_of_day)
+         .where('done_ratio <> 100 ')
+         .order(due_date: :ASC)
   end
 
   # project metrics
@@ -201,14 +201,14 @@ module IssueDataFetcher
   #
   # @return [Numeric] array id total issues
   def total_issue_amount(proj)
-    Issue.cross_project_scope(proj, "descendants").pluck(:id)
+    Issue.cross_project_scope(proj, 'descendants').pluck(:id)
   end
 
   # amount of issue in target
   #
   # @return [Numeric] array id of target issues
   def target_issue_amount(proj)
-    Issue.cross_project_scope(proj, "descendants").where(SQL_COM.to_s).pluck(:id)
+    Issue.cross_project_scope(proj, 'descendants').where(SQL_COM.to_s).pluck(:id)
   end
 
   # amount of issue in version
@@ -216,10 +216,10 @@ module IssueDataFetcher
   # @param [Project] proj project object
   # @return [Hash] amount of issues. each versions.
   def count_version_list(proj)
-    Issue.cross_project_scope(proj, "descendants").
-      where(SQL_COM.to_s).
-      joins(:fixed_version).
-      group("versions.name").count
+    Issue.cross_project_scope(proj, 'descendants')
+         .where(SQL_COM.to_s)
+         .joins(:fixed_version)
+         .group('versions.name').count
   end
 
   # amount of issue in assignee
@@ -227,9 +227,9 @@ module IssueDataFetcher
   # @param [Project] proj project object
   # @return [Hash] count of issues. each assignees (include noassign).
   def count_assignee_list(proj)
-    issues = Issue.cross_project_scope(proj, "descendants").
-               where(SQL_COM.to_s).
-               group(:assigned_to_id).count
+    issues = Issue.cross_project_scope(proj, 'descendants')
+                  .where(SQL_COM.to_s)
+                  .group(:assigned_to_id).count
     count_list = {}
     issues.each do |id, count|
       user_name = assignee_name id
@@ -243,10 +243,10 @@ module IssueDataFetcher
   # @param [Project] proj project object
   # @return [Hash] count of issues. each trackers.
   def count_tracker_list(proj)
-    Issue.cross_project_scope(proj, "descendants").
-      where(SQL_COM.to_s).
-      joins(:tracker).
-      group("trackers.name").count
+    Issue.cross_project_scope(proj, 'descendants')
+         .where(SQL_COM.to_s)
+         .joins(:tracker)
+         .group('trackers.name').count
   end
 
   # user name
@@ -265,9 +265,9 @@ module IssueDataFetcher
   # @param [Issue] issue parent issue
   # @return [Issue] cildren issue
   def issue_child(issue)
-    Issue.where(root_id: issue.root_id).
-      where("lft > ? AND rgt < ?", issue.lft, issue.rgt).
-      order(closed_on: :DESC).first
+    Issue.where(root_id: issue.root_id)
+         .where('lft > ? AND rgt < ?', issue.lft, issue.rgt)
+         .order(closed_on: :DESC).first
   end
 
   # latest setted done ratio journal
@@ -276,10 +276,10 @@ module IssueDataFetcher
   # @param [Date] basis_date basis date
   # @return [Journal] first of journals
   def issue_journal(issue, basis_date)
-    Journal.where(journalized_id: issue.id, journal_details: { prop_key: "done_ratio" }).
-      where("created_on <= ?", basis_date.end_of_day).
-      includes(:details).
-      order("journals.created_on")
+    Journal.where(journalized_id: issue.id, journal_details: { prop_key: 'done_ratio' })
+           .where('created_on <= ?', basis_date.end_of_day)
+           .includes(:details)
+           .order('journals.created_on')
   end
 
   # new issues with a difference from Baseline
@@ -313,5 +313,13 @@ module IssueDataFetcher
       ids << id unless actual_issue[id] == baseline_issue[id]
     end
     Issue.find(ids)
+  end
+
+  def issues_by_duration(cal_start_date, cal_end_date)
+    Issue.where(
+      '((start_date BETWEEN ? AND ?) OR (due_date BETWEEN ? AND ?))',
+      cal_start_date, cal_end_date,
+      cal_start_date, cal_end_date
+    )
   end
 end

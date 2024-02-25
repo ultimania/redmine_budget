@@ -21,7 +21,7 @@
 class Calendar
   include Redmine::Utils::DateCalculation
   attr_reader :startdt, :enddt
-  attr_writer :time_entries
+  attr_writer :time_entries, :events
 
   def initialize(date, _lang = current_language, period = :month)
     @date = date
@@ -56,9 +56,6 @@ class Calendar
     css << ' nwday' if non_working_week_days.include?(day.cwday)
     css
   end
-
-  # Sets calendar events
-  attr_writer :events
 
   # Returns events for the given day
   def events_on(day)

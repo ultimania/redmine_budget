@@ -1,6 +1,5 @@
 class BudgetsController < ApplicationController
   include IssueDataFetcher
-  include QueriesHelper
 
   before_action :find_project
 
@@ -23,24 +22,12 @@ class BudgetsController < ApplicationController
       current_language,
       :month
     )
-    retrieve_query
-    @query.group_by = nil
-    @query.sort_criteria = nil
-    return unless @query.valid?
 
     # Get events and time entries each of assignee
     events = []
     return unless @cfg_param[:selected_assignee_id]
 
-    # Get events
-    events = @query.issues(
-      include: %i[tracker assigned_to priority],
-      conditions: [
-        '((start_date BETWEEN ? AND ?) OR (due_date BETWEEN ? AND ?))',
-        @calendar.startdt, @calendar.enddt,
-        @calendar.startdt, @calendar.enddt
-      ]
-    )
+    events = issues_by_duration(@calendar.startdt, @calendar.enddt)
     @calendar.events = events
 
     # Get time entries
