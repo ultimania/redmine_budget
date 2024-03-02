@@ -12,7 +12,7 @@
         <fieldset><legend><%= l(:label_select_assignee) %></legend>
           <%= select_tag :selected_assignee_id,
               options_for_select(@selectable_assignees,
-                                @cfg_param[:selected_assignee_id]),
+                                @user),
                                 { multiple: true, size: 5 }%>
         </fieldset>
       </div>
@@ -33,53 +33,85 @@
 <%= form_tag({}, :data => {:cm_url => issues_context_menu_path}) do -%>
   <%= hidden_field_tag 'back_url', url_for(:params => request.query_parameters), :id => nil %>
   <table class="budget-cal">
-  <!-- Calender header -->
-  <tr class="budget-cal-header">
-    <td colspan="2"></td>
-    <% @calendar.format_month.each do |day| %>
-      <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell">
-        <p class="day-num"><%= day.day %>
-          <span class="abbr-day">(<%= abbr_day_name(day.cwday) %>)</span>
-        </p>
-      </td>
-    <% end %>
-  </tr>
-  <!-- Calender contents -->
-  <% if @cfg_param[:selected_assignee_id].present? %>
-    <% @cfg_param[:selected_assignee_id].each do |user| %>
+    <!-- Calender header -->
+    <tr class="budget-cal-header">
+      <td colspan="2"></td>
+      <% @calendar.format_month.each do |day| %>
+        <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell">
+          <p class="day-num"><%= day.day %>
+            <span class="abbr-day">(<%= abbr_day_name(day.cwday) %>)</span>
+          </p>
+        </td>
+      <% end %>
+    </tr>
+    <!-- Calender contents -->
+    <% if @users.present? %>
+      <% @users.each do |user| %>
+        <tr class="budget-cal-row budget-estimated">
+          <td class="budget-cal-user" rowspan="2">
+            <%= @selectable_assignees.invert[user.to_i] %>
+          </td>
+          <!-- estimated hours -->
+          <td class="budget-cal-cell budget-estimated row-header">予</td>
+          <% @calendar.format_month.each do |day| %>
+            <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell budget-estimated">
+              <p class="total-time">
+                <%= "#{@calendar.total_estimated_hours(user, day).round(1)}" %>
+              </p>
+            </td>
+          <% end %>
+          <td class="budget-cal-cell budget-estimated budget-total" >
+            <%= "#{@calendar.total_estimated_hours(user, nil).round(1)}" %>
+          </td>
+        </tr>
+        <tr class="budget-cal-row budget-entry">
+          <!-- time entries -->
+          <td class="budget-cal-cell budget-entry row-header">実</td>
+          <% @calendar.format_month.each do |day| %>
+            <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell budget-entry">
+              <p class="total-time">
+                <%= "#{@calendar.total_time_entries(user, day).round(1)}" %>
+              </p>
+            </td>
+          <% end %>
+          <td class="budget-cal-cell budget-entry budget-total" >
+            <%= "#{@calendar.total_time_entries(user, nil).round(1)}" %>
+          </td>
+        </tr>
+      <% end %>
+      <!-- summery by day -->
       <tr class="budget-cal-row budget-estimated">
         <td class="budget-cal-user" rowspan="2">
-          <%= @selectable_assignees.invert[user.to_i] %>
+          合計
         </td>
-        <!-- estimated hours -->
+      <!-- estimated hours -->
         <td class="budget-cal-cell budget-estimated row-header">予</td>
         <% @calendar.format_month.each do |day| %>
           <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell budget-estimated">
             <p class="total-time">
-              <%= "#{@calendar.total_estimated_hours(user, day).round(1)}" %>
+              <%= "#{@calendar.total_estimated_hours(nil, day).round(1)}" %>
             </p>
           </td>
         <% end %>
         <td class="budget-cal-cell budget-estimated budget-total" >
-          <%= "#{@calendar.total_estimated_hours(user).round(1)}" %>
+          <%= "#{@calendar.total_estimated_hours().round(1)}" %>
         </td>
       </tr>
+      <!-- entry hours -->
       <tr class="budget-cal-row budget-entry">
-        <!-- time entries -->
         <td class="budget-cal-cell budget-entry row-header">実</td>
         <% @calendar.format_month.each do |day| %>
           <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell budget-entry">
             <p class="total-time">
-              <%= "#{@calendar.total_time_entries(user, day).round(1)}" %>
+              <%= "#{@calendar.total_time_entries(nil, day).round(1)}" %>
             </p>
           </td>
         <% end %>
         <td class="budget-cal-cell budget-entry budget-total" >
-          <%= "#{@calendar.total_time_entries(user).round(1)}" %>
+          <%= "#{@calendar.total_time_entries().round(1)}" %>
         </td>
       </tr>
     <% end %>
-  <% end %>
   </table>
 <% end %>
 <%= context_menu %>
