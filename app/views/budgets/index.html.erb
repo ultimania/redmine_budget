@@ -12,7 +12,7 @@
         <fieldset><legend><%= l(:label_select_assignee) %></legend>
           <%= select_tag :selected_assignee_id,
               options_for_select(@selectable_assignees,
-                                @user),
+                                @users),
                                 { multiple: true, size: 5 }%>
         </fieldset>
       </div>
