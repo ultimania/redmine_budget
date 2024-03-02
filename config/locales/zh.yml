@@ -4,7 +4,7 @@ zh:
   title_budget_tab: 予実管理
 
   # contextual menu
-  tab_display_name: 予実管理
+  redmine_budget_tab_display_name: 予実管理
 
   # label
   label_select_assignee: select assignee

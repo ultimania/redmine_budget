@@ -3,7 +3,7 @@
   title_budget_tab: Budgets Management
 
   # contextual menu
-  tab_display_name: Budgets
+  redmine_budget_tab_display_name: Budgets
   
   # label
   label_select_assignee: select assignee
