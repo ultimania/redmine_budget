@@ -4,7 +4,6 @@ class BudgetsController < ApplicationController
 
   def index
     # Base variables
-    @budgets = Budget.all
     @selectable_assignees = selectable_assignee_list(@project)
 
     # Get from Params
