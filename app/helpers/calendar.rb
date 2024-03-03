@@ -83,7 +83,7 @@ class Calendar
     return 0.0 unless issues.present?
 
     issues.sum do |issue|
-      duration = issue.duration.zero? ? 1 : issue.duration
+      duration = issue.duration + 1
       result = day.nil? ? issue.total_estimated_hours.to_f : issue.total_estimated_hours.to_f / duration
     end
   end
