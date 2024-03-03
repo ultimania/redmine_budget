@@ -1,35 +1,15 @@
-# frozen_string_literal: true
-
-# Redmine - project management software
-# Copyright (C) 2006-2023  Jean-Philippe Lang
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Simple class to compute the start and end dates of a calendar
 class Calendar
   include Redmine::Utils::DateCalculation
-  attr_reader :startdt, :enddt
-  attr_writer :time_entries, :events
+  include IssueDataFetcher
 
-  def initialize(date, _lang = current_language, period = :month)
+  attr_reader :startdt, :enddt, :time_entries, :events
+
+  def initialize(date, users, period = :month)
     @date = date
-    @events = []
-    @time_entries = []
+    @users = users.present? ? users.map(&:to_i) : users
     @ending_events_by_days = {}
     @starting_events_by_days = {}
-    # set_language_if_valid lang
     case period
     when :month
       @startdt = Date.civil(date.year, date.month, 1)
@@ -40,6 +20,8 @@ class Calendar
     else
       raise 'Invalid period'
     end
+    @events = issues_by_duration(@startdt, @enddt)
+    @time_entries = TimeEntry.where(user_id: @users)
   end
 
   def format_month
@@ -88,10 +70,15 @@ class Calendar
     @last_dow ||= (first_wday + 5) % 7 + 1
   end
 
-  def total_estimated_hours(user, day = nil)
+  def total_estimated_hours(user = nil, day = nil)
     events = day.present? ? events_on(day) : @events
+    users = user.present? ? [user.to_i] : @users
     issues = events.select do |event|
-      event.assigned_to_id == user.to_i
+      if users.present?
+        users.include?(event.assigned_to_id)
+      else
+        event.assigned_to_id == -1
+      end
     end
     return 0.0 unless issues.present?
 
@@ -101,8 +88,9 @@ class Calendar
     end
   end
 
-  def total_time_entries(user, day = nil)
-    conditions = { user_id: user }
+  def total_time_entries(user = nil, day = nil)
+    users = user.present? ? [user.to_i] : @users
+    conditions = { user_id: users }
     conditions[:spent_on] = day if day.present?
 
     @time_entries
