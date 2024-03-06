@@ -39,7 +39,7 @@
       <% @calendar.format_month.each do |day| %>
         <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell">
           <p class="day-num"><%= day.day %>
-            <span class="abbr-day">(<%= abbr_day_name(day.cwday) %>)</span>
+            <span class="abbr-day">(<%= day.cwday %>)</span>
           </p>
         </td>
       <% end %>
