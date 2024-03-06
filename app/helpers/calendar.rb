@@ -3,9 +3,10 @@ class Calendar
   include Redmine::Utils::DateCalculation
   include IssueDataFetcher
 
-  attr_reader :startdt, :enddt, :time_entries, :events
+  attr_reader :startdt, :enddt, :time_entries, :events, :day_of_week
 
   def initialize(date, users, period = :month)
+    @day_of_week = %w[Non Mon Tue Wed Thu Fri Sat Sun]
     @date = date
     @users = users.present? ? users.map(&:to_i) : users
     @ending_events_by_days = {}
