@@ -71,26 +71,35 @@ class Calendar
     @last_dow ||= (first_wday + 5) % 7 + 1
   end
 
-  def total_estimated_hours(user = nil, day = nil)
+  def nwdays_count(start_date, end_date)
+    (start_date..end_date).to_a.count do |day|
+      non_working_week_days.include?(day.cwday)
+    end
+  end
+
+  def total_estimated_hours_by_day(user = nil, day = nil)
+    # return 0 when non working day
+    return 0.0 if day.present? && non_working_week_days.include?(day.cwday)
+
     events = day.present? ? events_on(day) : @events
     users = user.present? ? [user.to_i] : @users
-    issues = events.select do |event|
+    events_by_user = events.select do |event|
       if users.present?
         users.include?(event.assigned_to_id)
       else
         event.assigned_to_id == -1
       end
     end
-    return 0.0 unless issues.present?
+    return 0.0 unless events_by_user.present?
 
-    issues.sum do |issue|
-      duration = issue.duration + 1
-      result = day.nil? ? issue.total_estimated_hours.to_f : issue.total_estimated_hours.to_f / duration
+    events_by_user.sum do |event_by_user|
+      duration = event_by_user.duration - nwdays_count(event_by_user.start_date, event_by_user.due_date) + 1
+      day.present? ? event_by_user.total_estimated_hours.to_f / duration : event_by_user.total_estimated_hours.to_f
     end
   end
 
   def total_time_entries(user = nil, day = nil)
-    users = user.present? ? [user.to_i] : @users
+    users = user.present? ? [] : @users
     conditions = { user_id: users }
     conditions[:spent_on] = day if day.present?
 
