@@ -95,6 +95,12 @@ class Calendar
     end
     return 0.0 unless events_by_user.present?
 
+    if day.nil? && user.present?
+      events_by_user.each do |event|
+        puts "ID: #{event.id}, Estimated Hours: #{event.estimated_hours}"
+      end
+    end
+
     events_by_user.sum do |event_by_user|
       duration = event_by_user.duration - nwdays_count(event_by_user.start_date, event_by_user.due_date) + 1
       day.present? ? event_by_user.estimated_hours.to_f / duration : event_by_user.estimated_hours.to_f
