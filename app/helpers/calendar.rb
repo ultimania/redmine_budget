@@ -106,7 +106,7 @@ class Calendar
         event_by_user.estimated_hours.to_f / duration
       end
     end
-    result
+    result.round(1)
   end
 
   def total_time_entries(user = nil, day = nil)
