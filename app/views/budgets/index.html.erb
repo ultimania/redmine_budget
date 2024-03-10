@@ -56,12 +56,12 @@
           <% @calendar.format_month.each do |day| %>
             <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell budget-estimated">
               <p class="total-time">
-                <%= "#{@calendar.total_estimated_hours_by_day(user, day).round(1)}" %>
+                <%= "#{@calendar.total_estimated_hours_by_day(user, day)}" %>
               </p>
             </td>
           <% end %>
           <td class="budget-cal-cell budget-estimated budget-total" >
-            <%= "#{@calendar.total_estimated_hours_by_day(user, nil).round(1)}" %>
+            <%= "#{@calendar.total_estimated_hours_by_day(user, nil)}" %>
           </td>
         </tr>
         <tr class="budget-cal-row budget-entry">
@@ -89,12 +89,12 @@
         <% @calendar.format_month.each do |day| %>
           <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell budget-estimated">
             <p class="total-time">
-              <%= "#{@calendar.total_estimated_hours_by_day(nil, day).round(1)}" %>
+              <%= "#{@calendar.total_estimated_hours_by_day(nil, day)}" %>
             </p>
           </td>
         <% end %>
         <td class="budget-cal-cell budget-estimated budget-total" >
-          <%= "#{@calendar.total_estimated_hours_by_day().round(1)}" %>
+          <%= "#{@calendar.total_estimated_hours_by_day()}" %>
         </td>
       </tr>
       <!-- entry hours -->
@@ -103,12 +103,12 @@
         <% @calendar.format_month.each do |day| %>
           <td class="<%= @calendar.day_css_classes(day) %> budget-cal-cell budget-entry">
             <p class="total-time">
-              <%= "#{@calendar.total_time_entries(nil, day).round(1)}" %>
+              <%= "#{@calendar.total_time_entries(nil, day)}" %>
             </p>
           </td>
         <% end %>
         <td class="budget-cal-cell budget-entry budget-total" >
-          <%= "#{@calendar.total_time_entries().round(1)}" %>
+          <%= "#{@calendar.total_time_entries()}" %>
         </td>
       </tr>
     <% end %>
