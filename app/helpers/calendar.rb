@@ -94,7 +94,7 @@ class Calendar
 
     events_by_user.sum do |event_by_user|
       duration = event_by_user.duration - nwdays_count(event_by_user.start_date, event_by_user.due_date) + 1
-      day.present? ? event_by_user.total_estimated_hours.to_f / duration : event_by_user.total_estimated_hours.to_f
+      day.present? ? event_by_user.estimated_hours.to_f / duration : event_by_user.estimated_hours.to_f
     end
   end
 
