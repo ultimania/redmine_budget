@@ -84,28 +84,29 @@ class Calendar
     # return 0 when non working day
     return 0.0 if day.present? && non_working_week_days.include?(day.cwday)
 
-    events = day.present? ? events_on(day) : @events
+    result = 0.0
+    days = day.present? ? [day] : format_month
     users = user.present? ? [user.to_i] : @users
-    events_by_user = events.select do |event|
-      if users.present?
-        users.include?(event.assigned_to_id)
-      else
-        event.assigned_to_id == -1
+
+    days.each do |day|
+      next if non_working_week_days.include?(day.cwday)
+
+      events = events_on(day)
+      events_by_user = events.select do |event|
+        if users.present?
+          users.include?(event.assigned_to_id)
+        else
+          event.assigned_to_id == -1
+        end
+      end
+      next unless events_by_user.present?
+
+      result += events_by_user.sum do |event_by_user|
+        duration = event_by_user.duration - nwdays_count(event_by_user.start_date, event_by_user.due_date) + 1
+        event_by_user.estimated_hours.to_f / duration
       end
     end
-    return 0.0 unless events_by_user.present?
-
-    if day.nil? && user.present?
-      events_by_user.each do |event|
-        duration = event.duration - nwdays_count(event.start_date, event.due_date) + 1
-        puts "ID: #{event.id}, Estimated Hours: #{event.estimated_hours}, Duration: #{duration}, hours: #{event.estimated_hours.to_f / duration}"
-      end
-    end
-
-    events_by_user.sum do |event_by_user|
-      duration = event_by_user.duration - nwdays_count(event_by_user.start_date, event_by_user.due_date) + 1
-      day.present? ? event_by_user.estimated_hours.to_f / duration : event_by_user.estimated_hours.to_f
-    end
+    result
   end
 
   def total_time_entries(user = nil, day = nil)
