@@ -22,7 +22,10 @@ class Calendar
       raise 'Invalid period'
     end
     @events = issues_by_duration(@startdt, @enddt)
-    @time_entries = TimeEntry.where(user_id: @users)
+    conditions = {}
+    conditions[:user_id] = @users
+    conditions[:spent_on] = @startdt..@enddt
+    @time_entries = TimeEntry.where(conditions)
   end
 
   def format_month
@@ -99,9 +102,9 @@ class Calendar
   end
 
   def total_time_entries(user = nil, day = nil)
-    users = user.present? ? [] : @users
-    conditions = { user_id: users }
-    conditions[:spent_on] = day if day.present?
+    conditions = {}
+    conditions[:user_id] = user.present? ? [user.to_i] : @users
+    conditions[:spent_on] = day.present? ? day : @startdt..@enddt
 
     @time_entries
       .where(conditions)

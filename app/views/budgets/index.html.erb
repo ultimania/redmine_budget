@@ -75,7 +75,7 @@
             </td>
           <% end %>
           <td class="budget-cal-cell budget-entry budget-total" >
-            <%= "#{@calendar.total_time_entries(user, nil).round(1)}" %>
+            <%= "#{@calendar.total_time_entries(user, nil)}" %>
           </td>
         </tr>
       <% end %>
