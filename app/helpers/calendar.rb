@@ -118,5 +118,6 @@ class Calendar
       .where(conditions)
       .sum(:hours)
       .to_f
+      .round(1)
   end
 end
