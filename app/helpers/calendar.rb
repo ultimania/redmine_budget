@@ -97,7 +97,8 @@ class Calendar
 
     if day.nil? && user.present?
       events_by_user.each do |event|
-        puts "ID: #{event.id}, Estimated Hours: #{event.estimated_hours}"
+        duration = event.duration - nwdays_count(event.start_date, event.due_date) + 1
+        puts "ID: #{event.id}, Estimated Hours: #{event.estimated_hours}, Duration: #{duration}, hours: #{event.estimated_hours.to_f / duration}"
       end
     end
 
